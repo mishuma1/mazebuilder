@@ -35,6 +35,9 @@ class Cell:
         if self.west_wall:        
             line = Line(Point(self.x1, self.y1), Point(self.x1,self.y2))
             self.root_window.draw_line(line, "blue")
+        else:        
+            line = Line(Point(self.x1, self.y1), Point(self.x1,self.y2))
+            self.root_window.draw_line(line, "white")    
         if self.east_wall:        
             line = Line(Point(self.x2, self.y1), Point(self.x2,self.y2))
             self.root_window.draw_line(line, "blue")
