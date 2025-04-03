@@ -25,22 +25,24 @@ class Cell:
         self.solution = False
         self.outbound = None
 
-    def draw(self):
-        if self.north_wall:        
-            line = Line(Point(self.x1, self.y1), Point(self.x2,self.y1))
+    def color_line(self, wall, line):
+        if wall:
             self.root_window.draw_line(line, "blue")
-        if self.south_wall:        
-            line = Line(Point(self.x1, self.y2), Point(self.x2,self.y2))
-            self.root_window.draw_line(line, "blue")
-        if self.west_wall:        
-            line = Line(Point(self.x1, self.y1), Point(self.x1,self.y2))
-            self.root_window.draw_line(line, "blue")
-        else:        
-            line = Line(Point(self.x1, self.y1), Point(self.x1,self.y2))
+        else:
             self.root_window.draw_line(line, "white")    
-        if self.east_wall:        
-            line = Line(Point(self.x2, self.y1), Point(self.x2,self.y2))
-            self.root_window.draw_line(line, "blue")
+
+
+    def draw(self):
+        line_n = Line(Point(self.x1, self.y1), Point(self.x2,self.y1))
+        line_s = Line(Point(self.x1, self.y2), Point(self.x2,self.y2))
+        line_w = Line(Point(self.x1, self.y1), Point(self.x1,self.y2))
+        line_e = Line(Point(self.x2, self.y1), Point(self.x2,self.y2))
+
+        self.color_line(self.north_wall, line_n)
+        self.color_line(self.south_wall, line_s)
+        self.color_line(self.west_wall, line_w)
+        self.color_line(self.east_wall, line_e)
+
 
     def draw_move(self, to_cell, undo=False):
         bgcolor = "gray"

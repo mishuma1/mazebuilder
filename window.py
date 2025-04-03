@@ -47,7 +47,7 @@ class Window:
 		self.is_running = True
 		while self.is_running:
 			self.redraw()
-		print("Should exit")
+		print("Exiting...")
 
 	def close(self):
 		self.is_running = False

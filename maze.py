@@ -3,6 +3,15 @@ from constants import CELL_SIZE,NORMAL_WIN_X, NORMAL_WIN_Y,DRAW_SPEED
 from point import Point
 import random
 import time
+from enum import Enum
+from maze_helpers import set_walls
+
+opposite = {
+    "north" : "south",
+    "south" : "north",
+    "east" : "west",
+    "west" : "east"
+}
 
 class Maze:
     def __init__(self, win, max_x, max_y):
@@ -14,7 +23,6 @@ class Maze:
         #Might need to know if left or right of current spot and above/below current spot
         self.end_postition = [NORMAL_WIN_X, NORMAL_WIN_Y]
         self.end_point = f"{self.max_rows -1},{self.max_columns-1}"
-
 
     def fill_structure(self):
         #Adding edge frame
@@ -54,16 +62,6 @@ class Maze:
                 if self.end_point not in find_end:
                     current_paths.remove(path)
         return current_paths        
-
-    def opposite_side(self, wall):
-        if wall == "west":
-            return "east"
-        if wall == "east":
-            return "west"
-        if wall == "north":
-            return "south"
-        if wall == "south":
-            return "north"
 
     def print_wall_status(self, this_cell: Cell):
         #print(f"NW: {this_cell.north_wall}, SW: {this_cell.south_wall}, EW: {this_cell.east_wall}, WW: {this_cell.west_wall}")
@@ -114,7 +112,7 @@ class Maze:
 
             paths_to_take = ["north", "south", "east", "west"]
             #open the inbound path to this cell, and remove as an exit
-            opp_side = self.opposite_side(prev_cell.outbound)
+            opp_side = opposite[prev_cell.outbound]
             setattr(this_cell, f"{opp_side}_wall", False)                
             paths_to_take.remove(opp_side)
 
@@ -123,7 +121,7 @@ class Maze:
             east_cell = None 
             west_cell = None
             #print(f"A Y: {y}, X: {x}, A PATHS Left: {paths_to_take}")
-            self.print_wall_status(this_cell)
+            #self.print_wall_status(this_cell)
 
             if x == 0:
                 if prev_cell and prev_cell.outbound != "south":
@@ -173,11 +171,11 @@ class Maze:
                         x -= 1
             #else:
             #print(f"END Y: {y}, X: {x}, A PATHS Left: {paths_to_take}")
-            self.print_wall_status(this_cell)
+            #self.print_wall_status(this_cell)
 
             this_cell.draw()
             self.win.redraw()
-            time.sleep(DRAW_SPEED)
+            #time.sleep(DRAW_SPEED)
             #print("E++++++++++++++++++++++++++++++++++++++++++++++++++")
 
             
@@ -187,193 +185,19 @@ class Maze:
             #If x == max x or 0 then no north bound
             #If y == 0 or max y then no west
 
-        print(f"FEND Y: {y}, X: {x}")
+        #print(f"FEND Y: {y}, X: {x}")
         if x == self.max_columns-1  and y == self.max_rows-1:
-            print(f"Final Draw: {self.opposite_side(prev_cell.outbound)}")
+            #print(f"Final Draw: {opposite[prev_cell.outbound]}")
             #Set all to True, then apply logic - might not need
             this_cell = self.maze[y][x]
-            this_cell.north_wall = True
-            this_cell.south_wall = False
-            this_cell.west_wall = True
-            this_cell.east_wall = True
-            #OPen the 
-            #self.opposite_side(prev_cell.outbound)
-            setattr(this_cell, f"{self.opposite_side(prev_cell.outbound)}_wall", False)
+            this_cell = set_walls(this_cell, True, False, True, True, True, True)
+            setattr(this_cell, f"{opposite[prev_cell.outbound]}_wall", False)
 
             this_cell.draw()  
             self.win.redraw()
 
-        print(f"Found End")
+        #print(f"Found End")
             
-
-
-    def create_winning_path_orig(self):
-        x=0
-        y=0
-        found_end = False
-        prev_cell = None
-        while not found_end:
-            this_cell = self.maze[y][x]
-            this_cell.solution = True 
-            this_cell.touched = True       
-
-            if x == self.max_columns-1  and y == self.max_rows-1:
-                #Set all to True, then apply logic
-                this_cell.north_wall = True
-                this_cell.south_wall = True
-                this_cell.west_wall = True
-                this_cell.east_wall = True
-                #OPen the 
-                self.opposite_side(prev_cell.outbound)
-                setattr(this_cell, f"{self.opposite_side(prev_cell.outbound)}_wall", False)
-
-                this_cell.draw()
-                break    
-
-            north_cell = None 
-            south_cell = None
-            east_cell = None 
-            west_cell = None
-
-            paths_to_take = ["north", "south", "east", "west"]
-
-            opp_side = None
-            if prev_cell is not None:
-                opp_side = self.opposite_side(prev_cell.outbound)
-                setattr(this_cell, f"{opp_side}_wall", False)                
-                paths_to_take.remove(opp_side)
-
-            if x == 0:
-                this_cell.west_wall = True 
-                if prev_cell and prev_cell.outbound != "south":
-                    this_cell.north_wall = True   
-
-                if "west" in paths_to_take:
-                    paths_to_take.remove("west")
-                if "north" in paths_to_take:
-                    paths_to_take.remove("north")
-            elif x == self.max_columns-1:
-                this_cell.east_wall = True  
-                if prev_cell and prev_cell.outbound != "south":
-                    this_cell.north_wall = True  
-
-                if "east" in paths_to_take:
-                    paths_to_take.remove("east")                      
-                if "north" in paths_to_take:     
-                    paths_to_take.remove("north")                  
-            if y == 0:
-                this_cell.north_wall = True
-                if prev_cell and prev_cell.outbound != "east":
-                    this_cell.west_wall = True                                                          
-
-                if "north" in paths_to_take:
-                    paths_to_take.remove("north")
-                if "west" in paths_to_take:
-                    paths_to_take.remove("west")             
-            elif y == self.max_rows-1:
-                this_cell.south_wall = True
-                if prev_cell and prev_cell.outbound != "east":
-                    this_cell.west_wall = True     
-
-                if "south" in paths_to_take:
-                    paths_to_take.remove("south")  
-                if "west" in paths_to_take:    
-                    paths_to_take.remove("west")  
-                if "south" in paths_to_take:     
-                    paths_to_take.remove("south")  
-                                                        
-            end_point = f"{self.max_rows -1},{self.max_columns-1}"
-            if "west" in paths_to_take:
-                find_end = self.check_path_for_failure(self.maze.copy(),y, x-1, [f"{y},{x-1}"])
-                if end_point not in find_end:
-                    paths_to_take.remove("west")
-
-            if "north" in paths_to_take:      
-                find_end = self.check_path_for_failure(self.maze.copy(), y-1,x,[f"{y-1},{x}"])
-                if end_point not in find_end:
-                    paths_to_take.remove("north")
-
-            if "east" in paths_to_take:      
-                find_end = self.check_path_for_failure(self.maze.copy(), y,x+1,[f"{y},{x+1}"])
-                if end_point not in find_end:
-                    paths_to_take.remove("east")
-
-            if "south" in paths_to_take:      
-                find_end = self.check_path_for_failure(self.maze.copy(), y+1,x,[f"{y+1},{x}"])
-                if end_point not in find_end:
-                    paths_to_take.remove("south")                                        
-           
-            selected_path = []
-            #print(f"Remaining paths: {paths_to_take}")
-            while (len(paths_to_take) > 0):
-                path_out = random.randrange(0,len(paths_to_take))
-                wall_to_use = paths_to_take[path_out]
-                #print(f"Walltouse: {wall_to_use}")
-                ty=y
-                tx=x
-                match wall_to_use:
-                    case "north":
-                        ty -= 1
-                    case "south":
-                        ty += 1
-                    case "east":
-                        tx += 1
-                    case "west":
-                        tx -= 1
-
-                tmp_cell = self.maze[ty][tx]
-                already_used = getattr(tmp_cell, "touched")
-                #print(f"Already used:{already_used}")
-                if not already_used:
-                    selected_path.append(wall_to_use)
-                else:
-                    setattr(this_cell, f"{wall_to_use}_wall", True)
-                paths_to_take.remove(wall_to_use)
-
-            paths_to_take = selected_path
-            #print(f"Remaining paths: {paths_to_take}")
-
-            while (len(paths_to_take) > 1):
-                    path_out = random.randrange(0,len(paths_to_take))
-                    #Reflect to set the wall state
-                    wall_to_use = paths_to_take[path_out]
-                    setattr(this_cell, f"{wall_to_use}_wall", True)
-                    paths_to_take.remove(wall_to_use)
-                    #print(f"Remaining paths: {paths_to_take}")
-            
-            #print(f"DD NORTH: {this_cell.north_wall}, SOUTH: {this_cell.south_wall}, EAST:{this_cell.east_wall}, WEST: {this_cell.west_wall}")
-            if len(paths_to_take) > 0:
-                #print(f"CC PATH TO TAKE: {paths_to_take}")
-                prev_x = x
-                prev_y = y
-                this_cell.outbound = paths_to_take[0]
-                prev_cell = this_cell 
-                match paths_to_take[0]:
-                    case "north":
-                        y -= 1
-                    case "south":
-                        y += 1
-                    case "east":
-                        x += 1
-                    case "west":
-                        x -= 1
-            #else:
-                #print("CC No paths to take")
-            #print(f"CC NORTH: {this_cell.north_wall}, SOUTH: {this_cell.south_wall}, EAST:{this_cell.east_wall}, WEST: {this_cell.west_wall}") 
-            
-            this_cell.draw()
-            self.win.redraw()
-            time.sleep(.01)
-
-
-            #print("S================================================")
-            
-            #Now to figure out where to go and the allowed path to take
-            #If x == max x or 0 then no north bound
-            #If y == 0 or max y then no west
-
-        print(f"Found End")
-
     def check_path_for_failure(self, maze, y,x, tried):
         if f"{self.max_rows -1},{self.max_columns-1}" in tried:
             return tried
@@ -408,220 +232,125 @@ class Maze:
       
         return tried
  
-
     def complete_maze(self):
-        print("Filling the rest of the maze")
-        finished = False
-        x = 0
-        y = 0
-
-        spots_left = []
+        #print("Filling the rest of the maze")
         for row in range(0, self.max_rows):
             for across in range(0, self.max_columns):
                 if not self.maze[row][across].touched:
-                    spots_left.append([row,across])       
+                    #spots_left.append([row,across])     
+                    self.create_fillers(row,across)  
 
 
-
-        self.create_fillers(spots_left[0][0], spots_left[0][1])
-
-        print(f"LEN SPOTS: {len(spots_left)}")
-        print(f"SPOTS: {spots_left}")
-
-
-
-
-        #Start at 0,1 and if in use .. move to the end of the line, then go to row 1, if any are not used build from the unused spot
-        #Keep track of the last check to continue from
-
-    def open_new_path(self, logic, y, x, wall, path_to_open, t_maze):
-        opp_side = self.opposite_side(wall)
-
-        if logic:
+    def get_adj_cell(self, condition, path_cell, wall, y, x):
+        if condition:
             tmp_maze = self.maze[y][x]
-            opp_wall_status = getattr(tmp_maze, f"{opp_side}_wall")
-            if tmp_maze.solution and opp_wall_status:
-                path_to_open.append(wall)
-                t_maze.append(tmp_maze)
-        return path_to_open, t_maze
-
-    def create_fillers(self, y, x):
-        print(f"y: {y}, x: {x}")
-        current_cell = self.maze[y][x]
-
-        current_cell.north_wall = True
-        current_cell.south_wall = True
-        current_cell.west_wall = True
-        current_cell.east_wall = True
-
-#        current_cell = Cell(self.win, Point(x,y), Point(x,y))
-#        x=current_cell.x1
-#        y=current_cell.y1
-
-        #We need to see if our current position is starting next to a solution cell
+            if tmp_maze.touched:           
+                wall_status = getattr(tmp_maze, f"{wall}_wall")
+                setattr(tmp_maze, f"outbound", wall )
+                if wall_status:
+                    path_cell.append([wall, tmp_maze])     
+        return path_cell
+     
+    def create_connection(self, y, x):
+        #print(f"Connection Start y: {y}, x: {x}")
+ 
+        prev_cell = Cell(self.win, Point(0,0), Point(0,0))
         path_to_open = []
-        t_maze = []
+        #Step 1 get the possible walls around me
+        #print(f"PATHS OPEN? y: {y}->ymax:{self.max_rows}, x:{x}->xmax:{self.max_columns}")
+        path_to_open = self.get_adj_cell(y>0, path_to_open, "south", y-1, x)
+        path_to_open = self.get_adj_cell(y >= 0 and y < self.max_rows-1, path_to_open, "north", y+1, x)
+        path_to_open = self.get_adj_cell(x>0, path_to_open, "east", y, x-1)
+        path_to_open = self.get_adj_cell(x >= 0 and x < self.max_columns-1, path_to_open, "west", y, x+1)
 
-        path_to_open, t_maze = self.open_new_path(y>0, y-1, x, "south", path_to_open, t_maze)
-        path_to_open, t_maze = self.open_new_path(y<self.max_rows-1, y+1, x, "north", path_to_open, t_maze)
-        path_to_open, t_maze = self.open_new_path(x>0, y, x-1, "west", path_to_open, t_maze)
-        path_to_open, t_maze = self.open_new_path(x<self.max_columns-1, y, x+1, "east", path_to_open, t_maze)
-        print(f"AA y: {y}, x: {x}, paths_to_open: {path_to_open}")
 
-        paths_to_take = ["north", "south", "east", "west"]
-        if x == 0:
-            current_cell.north_wall = True   
-            paths_to_take = self.remove_path(paths_to_take, ["west"])
-            path_to_open = self.remove_path(path_to_open, ["west"]) 
-        elif x == self.max_columns-1:
-            current_cell.north_wall = True  
-            paths_to_take = self.remove_path(paths_to_take, ["east"])    
-            path_to_open = self.remove_path(path_to_open, ["east"])                 
 
-        if y == 0:
-            current_cell.west_wall = True              
-            paths_to_take = self.remove_path(paths_to_take, ["north"]) 
-            path_to_open = self.remove_path(path_to_open, ["north"])   
-
-        elif y == self.max_rows-1:
-            current_cell.west_wall = True
-            paths_to_take = self.remove_path(paths_to_take, ["south"])    
-            path_to_open = self.remove_path(path_to_open, ["south"]) 
-
-        print(f"BB y: {y}, x: {x}, paths_to_open: {path_to_open}")
-
+        #Randomly choose if more than one
         if len(path_to_open) > 0:
             #Clear the current wall to match an exiting wall, if one is found
-            print(f"CC paths_to_open: {path_to_open}")
+            #print(f"Historical Cell: paths_to_open: {path_to_open}")
             path_out = random.randrange(0,len(path_to_open))
-            wall_to_use = path_to_open[path_out]
-            print(f"CCC clearing current wall: {wall_to_use}")
-            setattr(current_cell, f"{wall_to_use}_wall", False)
-            paths_to_take.remove(wall_to_use) 
+            wall_to_use = path_to_open[path_out][0]
+            prev_cell = path_to_open[path_out][1]
+            #print(f"CCC clearing current wall: {wall_to_use}, y: {path_to_open[path_out][1].x1}, x:{path_to_open[path_out][1].y1}")
+            setattr(prev_cell, f"{wall_to_use}_wall", False)
+            prev_cell.draw()
+            connected = True
 
-            print(f"CCC clearing connecting wall: {self.opposite_side(wall_to_use)}")
-            clearing_cell = t_maze[path_out]
-            setattr(clearing_cell, f"{self.opposite_side(wall_to_use)}_wall", False)
-            
+        self.win.redraw()   
+        return prev_cell     
 
+    def create_fillers(self, y, x):
+        #print(f"Filler Start y: {y}, x: {x}")
+        connected = False
+        #Will call at the end again
+        prev_cell = self.create_connection(y, x)
+        if prev_cell.outbound is not None:
+            connected = True
 
-            #Clear the original wall
-            current_cell.draw()  
-            self.win.redraw()
-
-
-        print(f"y: {y}, x: {x}, walls next to us: {path_to_open}")
-        '''
-                         
-
-        path_out = random.randrange(0,len(path_to_open))
-        wall_to_use = paths_to_take[path_out]
-        setattr(this_cell, f"{wall_to_use}_wall", True)
-        paths_to_take.remove(wall_to_use)        
-
-
-        paths_to_take = ["north", "south", "east", "west"]
-        while x != self.max_columns-1  or y != self.max_rows-1 or len(paths_to_take) == 0:
-            #print("A++++++++++++++++++++++++++++++++++++++++++++++++++")
-            this_cell = self.maze[y][x]
-            this_cell.solution = True 
-            this_cell.touched = True  
-
-            this_cell.north_wall = True
-            this_cell.south_wall = True
-            this_cell.west_wall = True
-            this_cell.east_wall = True
-
+        while True:
             paths_to_take = ["north", "south", "east", "west"]
-            #open the inbound path to this cell, and remove as an exit
-            opp_side = self.opposite_side(prev_cell.outbound)
-            setattr(this_cell, f"{opp_side}_wall", False)                
-            paths_to_take.remove(opp_side)
+            this_cell = self.maze[y][x]
+            set_walls(this_cell, True, True, True, True, True)
 
-            north_cell = None 
-            south_cell = None
-            east_cell = None 
-            west_cell = None
-            #print(f"A Y: {y}, X: {x}, A PATHS Left: {paths_to_take}")
-            self.print_wall_status(this_cell)
-
+            #print(f"AA y: {y}, x: {x}, paths_to_open: {paths_to_take}")
             if x == 0:
-                if prev_cell and prev_cell.outbound != "south":
-                    this_cell.north_wall = True   
-                #paths_to_take = self.remove_path(paths_to_take, ["west", "north"])
+                this_cell.west_wall = True   
                 paths_to_take = self.remove_path(paths_to_take, ["west"])
             elif x == self.max_columns-1:
-                if prev_cell and prev_cell.outbound != "south":
-                    this_cell.north_wall = True  
-                paths_to_take = self.remove_path(paths_to_take, ["east", "north"])                    
-
+                this_cell.east_wall = True  
+                paths_to_take = self.remove_path(paths_to_take, ["east"])                 
             if y == 0:
-                if prev_cell and prev_cell.outbound != "east":
-                    this_cell.west_wall = True              
-                paths_to_take = self.remove_path(paths_to_take, ["west", "north"])                                                           
+                this_cell.north_wall = True              
+                paths_to_take = self.remove_path(paths_to_take, ["north"]) 
             elif y == self.max_rows-1:
-                if prev_cell and prev_cell.outbound != "east":
-                    this_cell.west_wall = True
-                paths_to_take = self.remove_path(paths_to_take, ["west", "south"])          
+                this_cell.south_wall = True
+                paths_to_take = self.remove_path(paths_to_take, ["south"])    
 
-            #print(f"B PATHS Left: {paths_to_take}")
-            tmp_maze = self.maze.copy()
-            paths_to_take = self.safe_choice(tmp_maze, "west", paths_to_take, y, x-1)
-            paths_to_take = self.safe_choice(tmp_maze, "north", paths_to_take, y-1,x)
-            paths_to_take = self.safe_choice(tmp_maze, "east", paths_to_take, y,x+1)
-            paths_to_take = self.safe_choice(tmp_maze, "south", paths_to_take, y+1,x)
+            #print(f"BB y: {y}, x: {x}, paths_to_open: {paths_to_take}")
+            #open the inbound path to this cell, and remove as an exit
+            if prev_cell.outbound:
+                setattr(this_cell, f"{opposite[prev_cell.outbound]}_wall", False)                
+                paths_to_take = self.remove_path(paths_to_take, [opposite[prev_cell.outbound]])
 
-            while (len(paths_to_take) > 1):
-                    path_out = random.randrange(0,len(paths_to_take))
-                    wall_to_use = paths_to_take[path_out]
-                    setattr(this_cell, f"{wall_to_use}_wall", True)
-                    paths_to_take.remove(wall_to_use)
+            if y>0 and self.maze[y-1][x].touched:
+                paths_to_take = self.remove_path(paths_to_take, ["north"])               
+            if y < self.max_rows-1 and self.maze[y+1][x].touched:
+                paths_to_take = self.remove_path(paths_to_take, ["south"])   
+            if x>0 and self.maze[y][x-1].touched:
+                paths_to_take = self.remove_path(paths_to_take, ["west"])   
+            if x<self.max_columns - 1 and self.maze[y][x+1].touched:
+                paths_to_take = self.remove_path(paths_to_take, ["east"])   
 
-            if len(paths_to_take) > 0:
-                this_cell.outbound = paths_to_take[0]
-                setattr(this_cell, f"{this_cell.outbound}_wall", False)                
+            #print(f"CC y: {y}, x: {x}, paths_to_open: {paths_to_take}")
 
-                prev_cell = this_cell 
-                match paths_to_take[0]:
-                    case "north":
-                        y -= 1
-                    case "south":
-                        y += 1
-                    case "east":
-                        x += 1
-                    case "west":
-                        x -= 1
-            #else:
-            #print(f"END Y: {y}, X: {x}, A PATHS Left: {paths_to_take}")
-            self.print_wall_status(this_cell)
+            if len(paths_to_take) == 0:
+                this_cell.draw()  
+                self.win.redraw()                
+                #print("Breaking")
+                break
 
-            this_cell.draw()
+            #Clear the current wall to match an exiting wall, if one is found
+            #print(f"CC paths_to_open: {paths_to_take}")
+            path_out = random.randrange(0,len(paths_to_take))
+            this_cell.outbound = paths_to_take[path_out]
+            #print(f"DDD clearing current wall: {this_cell.outbound}")
+            setattr(this_cell, f"{this_cell.outbound}_wall", False)
+
+            prev_cell = this_cell
+            match this_cell.outbound:
+                case "north":
+                    y -= 1
+                case "south":
+                    y += 1
+                case "west":
+                    x -= 1
+                case "east":
+                    x += 1
+
+            #Last line of the while
+            this_cell.draw()  
             self.win.redraw()
             time.sleep(DRAW_SPEED)
-            #print("E++++++++++++++++++++++++++++++++++++++++++++++++++")
 
-            
-            #print("S================================================")
-            
-            #Now to figure out where to go and the allowed path to take
-            #If x == max x or 0 then no north bound
-            #If y == 0 or max y then no west
-
-        print(f"FEND Y: {y}, X: {x}")
-        if x == self.max_columns-1  and y == self.max_rows-1:
-            print(f"Final Draw: {self.opposite_side(prev_cell.outbound)}")
-            #Set all to True, then apply logic - might not need
-            this_cell = self.maze[y][x]
-            this_cell.north_wall = True
-            this_cell.south_wall = False
-            this_cell.west_wall = True
-            this_cell.east_wall = True
-            #OPen the 
-            #self.opposite_side(prev_cell.outbound)
-            setattr(this_cell, f"{self.opposite_side(prev_cell.outbound)}_wall", False)
-
-            this_cell.draw()  
-            self.win.redraw()'
-            '''
-
-        print(f"Found End")
+        #print(f"Filler End")
