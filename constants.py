@@ -1,6 +1,6 @@
 WINDOW_TITLE="The Maze Builder"
 #Less than 50 will need to increase recursion, if commented out in main
-CELL_SIZE=50
+CELL_SIZE=20
 LINE_THICK=4
 WINDOW_SIZE_X=1200
 WINDOW_SIZE_Y=800

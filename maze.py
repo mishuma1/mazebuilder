@@ -166,6 +166,14 @@ class Maze:
                 tried = self.check_path_for_failure(maze, y+1, x, tried)
                 if f"{self.max_rows -1},{self.max_columns-1}" in tried:
                     return tried
+                
+        if x+1 < self.max_columns:
+            if not maze[y][x+1].touched and f"{y},{x+1}" not in tried:
+                tried.append(f"{y},{x+1}")
+                tried = self.check_path_for_failure(maze, y, x+1, tried)
+                if f"{self.max_rows -1},{self.max_columns-1}" in tried:
+                    return tried                     
+
         if y-1>= 0:
             if not maze[y-1][x].touched and f"{y-1},{x}" not in tried:
                 tried.append(f"{y-1},{x}")
@@ -173,12 +181,7 @@ class Maze:
                 if f"{self.max_rows -1},{self.max_columns-1}" in tried:
                     return tried                
 
-        if x+1 < self.max_columns:
-            if not maze[y][x+1].touched and f"{y},{x+1}" not in tried:
-                tried.append(f"{y},{x+1}")
-                tried = self.check_path_for_failure(maze, y, x+1, tried)
-                if f"{self.max_rows -1},{self.max_columns-1}" in tried:
-                    return tried                
+           
 
         if x-1>= 0:
             if not maze[y][x-1].touched and f"{y},{x-1}" not in tried:
