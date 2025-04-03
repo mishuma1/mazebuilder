@@ -9,3 +9,8 @@ def set_walls(current_cell: Cell, n,s,e,w, touched, solution=False):
     current_cell.solution = solution
     return current_cell   
 
+def remove_path(current_paths, remove_paths):
+    for remove_item in remove_paths:
+        if remove_item in current_paths:
+            current_paths.remove(remove_item)
+    return current_paths

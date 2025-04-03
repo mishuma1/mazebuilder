@@ -1,21 +1,18 @@
-from tkinter import Tk, BOTH, Canvas, Label, Button, Toplevel, Frame
+import time
 from line import Line
 from point import Point
-import random
-from constants import CELL_SIZE
-#from cell import Cell
+from constants import CELL_SIZE, DRAW_SPEED
+
+
 
 class Cell:
     def __init__(self, root, start_point: Point, end_point: Point, north_wall=False, south_wall=False, east_wall=False, west_wall=False):
-    #def __init__(self, root, start_point: Point, end_point: Point, north_wall=True, south_wall=True, east_wall=True, west_wall=True):
         self.root_window = root
         self.north_wall = north_wall
         self.south_wall = south_wall
         self.west_wall = west_wall
         self.east_wall = east_wall
 
-        #self.start_point = start_point
-        #self.end_point = end_point
         self.x1 = start_point.x
         self.y1 = start_point.y
         self.x2 = end_point.x
@@ -52,5 +49,7 @@ class Cell:
         midpoint = CELL_SIZE //2
         line = Line(Point(self.x1+midpoint,self.y1+midpoint), Point(to_cell.x1+midpoint,to_cell.y1+midpoint))
         line.draw(self.root_window.canvas, bgcolor)
+        self.root_window.redraw()
+        time.sleep(DRAW_SPEED * 10)
 
 

@@ -1,4 +1,4 @@
-from tkinter import Tk, BOTH, Canvas, Label, Button, Toplevel, Frame
+from tkinter import Canvas
 from point import Point
 from constants import LINE_THICK
 
