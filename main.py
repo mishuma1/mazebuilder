@@ -7,6 +7,7 @@ from constants import (
     WINDOW_TITLE, NORMAL_WIN_X, NORMAL_WIN_Y
 )
 from maze import Maze
+from traverse import Traverse
 import time
 import sys
 
@@ -29,6 +30,7 @@ def main():
     new_maze = Maze(new_win, NORMAL_WIN_X//CELL_SIZE, NORMAL_WIN_Y//CELL_SIZE)
     new_maze.create_winning_path()
     new_maze.complete_maze()
+    Traverse(new_maze)
     #maze_start = new_maze.maze[0][0]
     #maze_end = new_maze.maze[0][1]
     #maze_start.draw_move(maze_end, False)

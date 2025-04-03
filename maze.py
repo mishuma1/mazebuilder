@@ -18,6 +18,7 @@ class Maze:
         self.win = win
         self.max_columns = max_x
         self.max_rows = max_y
+        self.start_yx = [0,0]
         self.maze = self.fill_structure()
         #Later change to random spot from midpoint to MAX, color the start and end, maybe
         #Might need to know if left or right of current spot and above/below current spot
@@ -91,6 +92,7 @@ class Maze:
     def create_winning_path(self):
         print(f"ROWS: {self.max_rows}, COLS: {self.max_columns}")
         prev_cell = self.start_position_rand()
+        self.start_yx = [prev_cell.y1,0]
         x=0
         y=prev_cell.y1
 
@@ -239,7 +241,6 @@ class Maze:
                 if not self.maze[row][across].touched:
                     #spots_left.append([row,across])     
                     self.create_fillers(row,across)  
-
 
     def get_adj_cell(self, condition, path_cell, wall, y, x):
         if condition:
