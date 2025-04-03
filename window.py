@@ -1,6 +1,5 @@
-from tkinter import Tk, BOTH, Canvas, Label, Button, Toplevel, Frame
+from tkinter import Tk, BOTH, Canvas
 from line import Line
-from point import Point
 from constants import NORMAL_WIN_Y, NORMAL_WIN_X, WINDOW_TITLE
 
 class Window:

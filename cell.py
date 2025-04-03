@@ -1,7 +1,7 @@
 import time
 from line import Line
 from point import Point
-from constants import CELL_SIZE, DRAW_SPEED
+from constants import CELL_SIZE, LINE_DRAW_SPEED, UNDO_LINE_SPEED
 
 
 
@@ -50,6 +50,9 @@ class Cell:
         line = Line(Point(self.x1+midpoint,self.y1+midpoint), Point(to_cell.x1+midpoint,to_cell.y1+midpoint))
         line.draw(self.root_window.canvas, bgcolor)
         self.root_window.redraw()
-        time.sleep(DRAW_SPEED * 10)
+        if undo:
+            time.sleep(UNDO_LINE_SPEED)
+        else:
+            time.sleep(LINE_DRAW_SPEED)    
 
 

@@ -1,7 +1,7 @@
 import random
 import time
 from cell import Cell
-from constants import CELL_SIZE,NORMAL_WIN_X, NORMAL_WIN_Y,DRAW_SPEED
+from constants import CELL_SIZE,NORMAL_WIN_X, NORMAL_WIN_Y,MAZE_DRAW_SPEED
 from point import Point
 from maze_helpers import set_walls,remove_path
 
@@ -285,5 +285,5 @@ class Maze:
             #Last line of the while
             this_cell.draw()  
             self.win.redraw()
-            time.sleep(DRAW_SPEED)
+            time.sleep(MAZE_DRAW_SPEED)
 
